@@ -47,11 +47,16 @@ jobs:
       - name: Install Dependencies
         shell: bash
         run: poetry install
-        if: steps.cache.outputs.cache-hit != 'true'
+
+      # Install Jupyter and set up the kernel
+      - name: Install Jupyter and Kernel
+        shell: bash
+        run: |
+          poetry run python -m ipykernel install --user --name=taxi_demand_predictor --display-name "taxi_demand_predictor (Python 3.12.3)"
 
       # Run the feature pipeline notebook from the command line (using run jupyter nbconvert)
       - name: Execute Python workflow from batch script
         shell: bash
         env:  
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: poetry run jupyter nbconvert --to notebook --execute taxi_demand_predictor/notebooks/12_feature_pipeline.ipynb
+        run: poetry run jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=taxi_demand_predictor taxi_demand_predictor/notebooks/12_feature_pipeline.ipynb
