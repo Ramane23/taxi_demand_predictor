@@ -57,6 +57,8 @@ jobs:
       # Run the feature pipeline notebook from the command line (using run jupyter nbconvert)
       - name: Execute Python workflow from batch script
         shell: bash
-        env:  
+        env:
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: poetry run jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=taxi_demand_predictor taxi_demand_predictor/notebooks/12_feature_pipeline.ipynb
+        run: |
+          export HOPSWORKS_API_KEY=${{ secrets.HOPSWORKS_API_KEY }}
+          poetry run jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=taxi_demand_predictor taxi_demand_predictor/notebooks/12_feature_pipeline.ipynb
