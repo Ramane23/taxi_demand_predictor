@@ -28,12 +28,11 @@ jobs:
           virtualenvs-in-project: true
           installer-parallel: true
 
-      # Add Poetry to PATH
+      # Add Poetry to PATH using environment files
       - name: Add Poetry to PATH
-        shell: powershell
         run: |
           $poetryPath = "$env:LOCALAPPDATA\pypoetry\bin"
-          echo "##[set-env name=POETRY_HOME]$poetryPath"
+          echo "POETRY_HOME=$poetryPath" >> $env:GITHUB_ENV
           echo "$poetryPath" | Out-File -FilePath $env:GITHUB_PATH -Append
 
       # Verify Poetry installation
