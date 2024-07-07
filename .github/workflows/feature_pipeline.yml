@@ -28,6 +28,10 @@ jobs:
           virtualenvs-in-project: true
           installer-parallel: true
 
+      # Verify Poetry installation
+      - name: Verify Poetry installation
+        run: poetry --version
+
       # Poetry install to install all the dependencies or requirements
       - name: Install Dependencies
         run: poetry install
