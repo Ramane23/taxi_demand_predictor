@@ -41,7 +41,7 @@ jobs:
 
       # List files in the notebooks directory
       - name: List files in notebooks directory
-        run: dir notebooks
+        run: dir taxi_demand_predictor/notebooks
 
       # Poetry install to install all the dependencies or requirements
       - name: Install Dependencies
@@ -54,4 +54,4 @@ jobs:
         shell: bash
         env:  
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
-        run: poetry run jupyter nbconvert --to notebook --execute notebooks/12_feature_pipeline.ipynb
+        run: poetry run jupyter nbconvert --to notebook --execute taxi_demand_predictor/notebooks/12_feature_pipeline.ipynb
