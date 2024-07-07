@@ -31,24 +31,23 @@ jobs:
       # Add Poetry to PATH using environment files
       - name: Add Poetry to PATH
         run: |
-          $poetryPath = "$env:LOCALAPPDATA\pypoetry\bin"
-          echo "POETRY_HOME=$poetryPath" >> $env:GITHUB_ENV
-          echo "$poetryPath" | Out-File -FilePath $env:GITHUB_PATH -Append
+          echo "${{ env.LOCALAPPDATA }}\\pypoetry\\bin" >> $env:GITHUB_PATH
+          echo "POETRY_HOME=${{ env.LOCALAPPDATA }}\\pypoetry\\bin" >> $env:GITHUB_ENV
 
       # Verify Poetry installation
       - name: Verify Poetry installation
-        shell: powershell
+        shell: bash
         run: poetry --version
 
       # Poetry install to install all the dependencies or requirements
       - name: Install Dependencies
-        shell: powershell
+        shell: bash
         run: poetry install
         if: steps.cache.outputs.cache-hit != 'true'
 
       # Run the feature pipeline notebook from the command line (using run jupyter nbconvert)
       - name: Execute Python workflow from batch script
-        shell: powershell
+        shell: bash
         env:  
           HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
         run: poetry run jupyter nbconvert --to notebook --execute notebooks/12_feature_pipeline.ipynb
