@@ -39,6 +39,10 @@ jobs:
         shell: bash
         run: poetry --version
 
+      # List files in the notebooks directory
+      - name: List files in notebooks directory
+        run: dir notebooks
+
       # Poetry install to install all the dependencies or requirements
       - name: Install Dependencies
         shell: bash
