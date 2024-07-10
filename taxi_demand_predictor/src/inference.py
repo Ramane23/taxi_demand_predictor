@@ -28,14 +28,16 @@ def load_batch_of_features_from_store(current_date: pd.Timestamp) -> pd.DataFram
             - `pickup_hour`
             - `rides`
             - `pickup_location_id`
-            - `pickup_ts`
     """
+    # Convert current_date to timezone-aware datetime
+    current_date = current_date.tz_localize('UTC')
+
     feature_store = get_feature_store()
     n_features = config.N_FEATURES
-    # Read time_series data from the feature store
+    # Read time_series data from the feature_store
     fetch_data_from = current_date - timedelta(days=28)
     fetch_data_to = current_date - timedelta(hours=1)
-    print(f"Fetching data from {fetch_data_from} to {fetch_data_to}")
+    print(f"fetching data from {fetch_data_from} to {fetch_data_to}")
     feature_view = feature_store.get_feature_view(
         name=config.FEATURE_VIEW_NAME,
         version=config.FEATURE_VIEW_VERSION
@@ -44,39 +46,25 @@ def load_batch_of_features_from_store(current_date: pd.Timestamp) -> pd.DataFram
         start_time=(fetch_data_from - timedelta(days=1)),
         end_time=(fetch_data_to + timedelta(days=1))
     )
+
+    # Convert pickup_hour column to UTC if it is not already
+    if ts_data['pickup_hour'].dt.tz is None:
+        ts_data['pickup_hour'] = pd.to_datetime(ts_data['pickup_hour']).dt.tz_localize('UTC')
+    else:
+        ts_data['pickup_hour'] = ts_data['pickup_hour'].dt.tz_convert('UTC')
+
     ts_data = ts_data[ts_data.pickup_hour.between(fetch_data_from, fetch_data_to)]
-    
-    # Print data for debugging
-    print(f"Fetched data:\n{ts_data.head()}")
-    print(f"Number of records fetched: {len(ts_data)}")
-    
     # Validate we are not missing data in the feature store
     location_ids = ts_data['pickup_location_id'].unique()
-    print(f"Number of unique locations: {len(location_ids)}")
-    print(f"Expected number of records: {n_features * len(location_ids)}")
-    
-    missing_combinations = []
-    for location_id in location_ids:
-        location_data = ts_data[ts_data.pickup_location_id == location_id]
-        if len(location_data) != n_features:
-            missing_combinations.append(location_id)
-    
-    if missing_combinations:
-        print(f"Missing data for the following pickup_location_ids: {missing_combinations}")
-    
-    assert len(ts_data) == n_features * len(location_ids), \
-        "Time-series data is not complete. Make sure your feature pipeline is up and running."
-    
+    assert len(ts_data) == n_features * len(location_ids), "Time-series data is not complete. Make sure your feature pipeline is up and running."
     # Sort by location and time
     ts_data.sort_values(by=['pickup_location_id', 'pickup_hour'], inplace=True)
-    
     # Transform time-series data into a feature vector for each `pickup_location_id`
     x = np.ndarray(shape=(len(location_ids), n_features), dtype=np.float32)
     for i, location_id in enumerate(location_ids):
         ts_data_i = ts_data.loc[ts_data.pickup_location_id == location_id, :]
         ts_data_i = ts_data_i.sort_values(by=['pickup_hour'])
         x[i, :] = ts_data_i['rides'].values
-    
     # Convert numpy arrays to pandas DataFrame
     features = pd.DataFrame(
         x,

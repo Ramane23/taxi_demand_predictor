@@ -1,4 +1,4 @@
-name: feature-pipeline  # Define the name of the GitHub Actions workflow
+name: training-pipeline  # Define the name of the GitHub Actions workflow
 
 on:
   workflow_dispatch:  # Allow the workflow to be manually triggered from the GitHub UI
