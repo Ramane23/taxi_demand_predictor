@@ -1,0 +1,3 @@
+#setting streamlit to dark mode
+[theme]
+base="dark"
