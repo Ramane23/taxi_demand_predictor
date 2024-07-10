@@ -1,8 +1,8 @@
 name: feature-pipeline  # Define the name of the GitHub Actions workflow
 
-on:  # Specify the triggers for the workflow
-  schedule:  # Define a schedule trigger
-    - cron: '0 * * * *'  # Run the workflow every hour at the start of the hour
+on:
+  schedule:
+    - cron: '0,30 * * * *'  # Run the workflow every 30 minutes
 
   workflow_dispatch:  # Allow the workflow to be manually triggered from the GitHub UI
 
