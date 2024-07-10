@@ -1,0 +1,61 @@
+name: feature-pipeline  # Define the name of the GitHub Actions workflow
+
+on:
+  workflow_dispatch:  # Allow the workflow to be manually triggered from the GitHub UI
+
+jobs:
+  feature_pipeline:
+    runs-on: windows-latest  # Specify the OS to run the job on (latest Windows)
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Installing Python 3.12
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+
+      # Installing Poetry
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+          installer-parallel: true
+
+      # Add Poetry to PATH using environment files
+      - name: Add Poetry to PATH
+        run: |
+          echo "${{ env.LOCALAPPDATA }}\\pypoetry\\bin" >> $env:GITHUB_PATH
+          echo "POETRY_HOME=${{ env.LOCALAPPDATA }}\\pypoetry\\bin" >> $env:GITHUB_ENV
+
+      # Verify Poetry installation
+      - name: Verify Poetry installation
+        shell: bash
+        run: poetry --version
+
+      # List files in the notebooks directory
+      - name: List files in notebooks directory
+        run: dir taxi_demand_predictor/notebooks
+
+      # Poetry install to install all the dependencies or requirements
+      - name: Install Dependencies
+        shell: bash
+        run: poetry install
+
+      # Install Jupyter and set up the kernel
+      - name: Install Jupyter and Kernel
+        shell: bash
+        run: |
+          poetry run python -m ipykernel install --user --name=taxi_demand_predictor --display-name "taxi_demand_predictor (Python 3.12.3)"
+
+      # Run the feature pipeline notebook from the command line (using run jupyter nbconvert)
+      - name: Execute Python workflow from batch script
+        shell: bash
+        env:
+          HOPSWORKS_API_KEY: ${{ secrets.HOPSWORKS_API_KEY }}
+        run: |
+          export HOPSWORKS_API_KEY=${{ secrets.HOPSWORKS_API_KEY }}
+          poetry run jupyter nbconvert --to notebook --execute --inplace --ExecutePreprocessor.kernel_name=taxi_demand_predictor taxi_demand_predictor/notebooks/13_model_training_pipeline.ipynb
