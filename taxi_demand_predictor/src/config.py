@@ -22,5 +22,5 @@ FEATURE_VIEW_VERSION = 1
 # number of historical values our model needs to generate predictions
 N_FEATURES = 24 * 28
 MODEL_NAME = 'taxi_demand_predictor_next_hour'
-MODEL_VERSION = 1
+MODEL_VERSION = 2
 FEATURE_GROUP_MODEL_PREDICTIONS = 'model_predictions_feature_group'

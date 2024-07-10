@@ -29,8 +29,9 @@ def load_batch_of_features_from_store(current_date: pd.Timestamp) -> pd.DataFram
             - `rides`
             - `pickup_location_id`
     """
-    # Convert current_date to timezone-aware datetime
-    current_date = current_date.tz_localize('UTC')
+    # Ensure current_date is timezone-aware
+    if current_date.tzinfo is None:
+        current_date = current_date.tz_localize('UTC')
 
     feature_store = get_feature_store()
     n_features = config.N_FEATURES
