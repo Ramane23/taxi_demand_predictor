@@ -1,13 +1,16 @@
 import zipfile  # Importing the zipfile module for working with zip archives
 from datetime import datetime, timedelta  # Importing datetime and timedelta for date and time manipulations
-
 import requests  # Importing requests module for making HTTP requests
 import numpy as np  # Importing numpy for numerical operations
 import pandas as pd  # Importing pandas for data manipulation and analysis
 import streamlit as st  # Importing streamlit for building interactive web applications
 import geopandas as gpd  # Importing geopandas for working with geospatial data
 import pydeck as pdk  # Importing pydeck for creating deck.gl visualizations
+import sys
+import os
 
+# Adjust the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from src.inference import (  # Importing custom functions from the src.inference module
     load_predictions_from_store,
     load_batch_of_features_from_store
@@ -26,7 +29,6 @@ st.header(f'{current_date} UTC')  # Setting the header to display the current da
 progress_bar = st.sidebar.header('⚙️ Working Progress')
 progress_bar = st.sidebar.progress(0)
 N_STEPS = 6  # Number of steps in the progress bar
-
 
 def load_shape_data_file() -> gpd.geodataframe.GeoDataFrame:
     """
@@ -60,11 +62,9 @@ def load_shape_data_file() -> gpd.geodataframe.GeoDataFrame:
     # Reading the shape file and converting the coordinate reference system to EPSG:4326
     return gpd.read_file(DATA_DIR / 'taxi_zones/taxi_zones.shp').to_crs('epsg:4326')
 
-
 @st.cache_data
 def _load_batch_of_features_from_store(current_date: datetime) -> pd.DataFrame:
-    """Wrapped version of src.inference.load_batch_of_features_from_store, so
-    we can add Streamlit caching
+    """Wrapped version of src.inference.load_batch_of_features_from_store, so we can add Streamlit caching
 
     Args:
         current_date (datetime): The current date and time
@@ -80,15 +80,12 @@ def _load_batch_of_features_from_store(current_date: datetime) -> pd.DataFrame:
     """
     return load_batch_of_features_from_store(current_date)  # Calling the load_batch_of_features_from_store function
 
-
 @st.cache_data
 def _load_predictions_from_store(
     from_pickup_hour: datetime,
     to_pickup_hour: datetime
 ) -> pd.DataFrame:
-    """
-    Wrapped version of src.inference.load_predictions_from_store, so we
-    can add Streamlit caching
+    """Wrapped version of src.inference.load_predictions_from_store, so we can add Streamlit caching
 
     Args:
         from_pickup_hour (datetime): Minimum datetime (rounded hour) for which we want to get predictions
@@ -98,7 +95,6 @@ def _load_predictions_from_store(
         pd.DataFrame: 2 columns: pickup_location_id, predicted_demand
     """
     return load_predictions_from_store(from_pickup_hour, to_pickup_hour)  # Calling the load_predictions_from_store function
-
 
 with st.spinner(text="Downloading shape file to plot taxi zones"):
     geo_df = load_shape_data_file()  # Loading shape data file
@@ -133,14 +129,10 @@ else:
     # Raising an exception if features are not available for the last 2 hours
     raise Exception('Features are not available for the last 2 hours. Is your feature pipeline up and running? 🤔')
 
-
 with st.spinner(text="Preparing data to plot"):
 
     def pseudocolor(val, minval, maxval, startcolor, stopcolor):
-        """
-        Convert value in the range minval...maxval to a color in the range
-        startcolor to stopcolor. The colors passed and the one returned are
-        composed of a sequence of N component values.
+        """Convert value in the range minval...maxval to a color in the range startcolor to stopcolor. The colors passed and the one returned are composed of a sequence of N component values.
 
         Credits to https://stackoverflow.com/a/10907855
         """

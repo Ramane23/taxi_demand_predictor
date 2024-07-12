@@ -1,6 +1,10 @@
+import sys
 import os
+
+# Adjust the Python path
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from dotenv import load_dotenv
-from src.feature_store_api import FeatureGroupConfig, FeatureViewConfig
+from src.feature_store_config import FeatureGroupConfig, FeatureViewConfig
 from src.paths import PARENT_DIR
 
 # Load key-value pairs from .env file located in the parent directory
