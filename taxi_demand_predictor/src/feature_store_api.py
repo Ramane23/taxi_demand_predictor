@@ -62,12 +62,12 @@ def get_or_create_feature_group(
     """
     # Get or create the feature group in the feature store
     return get_feature_store().get_or_create_feature_group(
-        name=feature_group_metadata.name,
-        version=feature_group_metadata.version,
-        description=feature_group_metadata.description,
-        primary_key=feature_group_metadata.primary_key,
-        event_time=feature_group_metadata.event_time,
-        online_enabled=feature_group_metadata.online_enabled
+        name=config.FEATURE_GROUP_METADATA.name,
+        version=config.FEATURE_GROUP_METADATA.version,
+        description=config.FEATURE_GROUP_METADATA.description,
+        primary_key=config.FEATURE_GROUP_METADATA.primary_key,
+        event_time=config.FEATURE_GROUP_METADATA.event_time,
+        online_enabled=config.FEATURE_GROUP_METADATA.online_enabled
     )
 
 def get_or_create_feature_view(
