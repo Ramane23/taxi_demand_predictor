@@ -84,8 +84,8 @@ def load_predictions_and_actual_values_from_store(
     query = predictions_fg.select_all() \
         .join(actuals_fg.select(['pickup_location_id', 'pickup_hour']),
               on=['pickup_hour', 'pickup_location_id'], prefix=None) \
-        .filter(predictions_fg.pickup_ts >= from_ts) \
-        .filter(predictions_fg.pickup_ts <= to_ts)
+        .filter(predictions_fg.pickup_hour >= from_ts) \
+        .filter(predictions_fg.pickup_hour <= to_ts)
 
     # Get the feature store instance
     feature_store = get_feature_store()
